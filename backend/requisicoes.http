@@ -1,0 +1,12 @@
+GET http://localhost:3001/produtos
+
+
+###
+POST http://localhost:3001/produtos
+content-type: application/json
+
+{
+    "nome": "Xiaomi Redmi note 13",
+    "descricao": "Celular Xiaomi grande",
+    "preco": 1299.00
+}
