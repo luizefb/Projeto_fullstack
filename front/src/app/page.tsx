@@ -1,103 +1,147 @@
-import Image from "next/image";
+'use client'
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [produto, setProduto] = useState<any>({})
+  const [produtos, setProdutos] = useState<any>([])
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  useEffect(() => {
+      obterProdutos()
+  }, []) 
+
+
+  async function obterProdutos() {
+    const resp = await fetch('http://localhost:3001/produtos')
+      const produtos = await resp.json()
+      .then(setProdutos)
+  }
+
+  async function criarProdutos() {
+    await fetch('http://localhost:3001/produtos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(produto)
+    })
+    setProduto({})
+    await obterProdutos()
+  }
+
+  async function alterarProdutos() {
+    await fetch(`http://localhost:3001/produtos/${produto.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(produto)
+    })
+    setProduto({})
+    await obterProdutos()
+  }
+
+  async function excluirProdutos(id: number) {
+    await fetch(`http://localhost:3001/produtos/${id}`, {
+        method: 'DELETE',
+    })
+    await obterProdutos()
+  }
+
+  async function obterProdutosPorId(id: number) {
+    const resp = await fetch(`http://localhost:3001/produtos/${id}`)
+    const produto = await resp.json()
+    setProduto(produto)
+  }
+
+  function renderizarFormProduto() {
+    return (
+      <div className="flex gap-5 items-end">
+        <div className="flex flex-col">
+          <label htmlFor="nome">Nome produto</label>
+          <input 
+            id="nome"
+            type='text' 
+            value={produto.nome ?? ''} 
+            onChange={e => setProduto({ ...produto, nome: e.target.value })}
+            className="bg-gray-300 border-2 rounded-md p-2"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="flex flex-col">
+          <label htmlFor="descricao">Descrição</label>
+          <input 
+            id="descricao"
+            type='text' 
+            value={produto.descricao ?? ''} 
+            onChange={e => setProduto({ ...produto, descricao: e.target.value })}
+            className="bg-gray-300 border-2 rounded-md p-2"
+            />
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="preco">Preço</label>
+            <input 
+              id="preco"
+              type='number' 
+              value={produto.preco ?? ''} 
+              onChange={e => setProduto({ ...produto, preco: +e.target.value })}
+              className="bg-gray-300 border-2 rounded-md p-2"
+              />
+        </div>
+        <div>
+          {produto.id ? (
+              <button 
+              onClick={alterarProdutos}
+              className="bg-blue-500 rounded-md px-4 py-2"
+            >
+              Alterar Produto
+            </button>
+          ) : (
+            <button 
+            onClick={criarProdutos}
+            className="bg-blue-500 rounded-md px-4 py-2"
+          >
+            Criar Produto
+          </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  function renderizarProdutos() {
+    return (
+      <div className="flex flex-col gap-2">
+        {produtos.map((produto: any) =>(
+          <div key={produto.id} className="flex px-4 py-2 items-center gap-2 bg-cyan-200 p-2 rounded-md">
+            <div className="flex-1 ">{produto.nome}</div>
+            <div>{produto.preco}</div>
+
+            <div>
+            <button 
+                onClick={() => obterProdutosPorId(produto.id)}
+                className="p-2 bg-green-500 rounded-md"
+              >
+                Alterar
+              </button>
+
+              <button 
+                onClick={() => excluirProdutos(produto.id)}
+                className="p-2 bg-red-500 rounded-md"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col justify-center items-center h-screen gap-10">
+      {renderizarFormProduto()}
+      {renderizarProdutos()}
     </div>
   );
 }
